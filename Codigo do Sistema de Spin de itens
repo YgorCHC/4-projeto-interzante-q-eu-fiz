@@ -1,0 +1,93 @@
+-- Esse script é um Free model que EU FIZ ao tempinho atras porq tava entendiado
+
+task.wait(5)
+local plr = script.Parent.Parent.Parent
+
+local Currency = "" -- Altera pro nome da sua moeda do jogo!
+local Escoye = false
+-- Conseguindo a moeda!
+if Currency == "" then
+	for _, instaces in pairs(plr:GetChildren()) do
+		if instaces.Name == "leaderstats" or instaces.Name == "Data" and Escoye == false then
+			local primeiro = false
+			
+			for _, sla in pairs(instaces:GetChildren()) do
+				if sla:IsA('NumberValue') or sla:IsA('IntValue') and primeiro == false then
+					primeiro = true
+					Currency = sla
+				end
+			end
+		elseif Escoye == false then
+			Escoye = true
+			local Leader = Instance.new('Folder',plr)
+			Leader.Name = 'leaderstats'
+			
+			local IntValue = Instance.new('IntValue',Leader)
+			IntValue.Name = "Money"
+			IntValue.Value = 10
+			Currency = IntValue
+		end
+	end
+else
+	for _, instaces in pairs(plr:GetDescendants()) do
+		if instaces.Name == Currency and instaces:IsA('IntValue') or instaces:IsA('NumberValue') then
+			Currency = instaces
+		end
+	end
+end
+
+-- Sistema Basico (Abre e fecha etc...)
+
+-- Variavels
+local Button = script.Parent.Button
+local MainFrame = script.Parent.MainMenu
+local Gui = script.Parent
+local SpinHud = MainFrame.Frames.Spin
+local ItensHud = MainFrame.Frames.Itens
+local ItensButton = MainFrame.Itens
+local ChangeMenuSpin = MainFrame.Spin
+local SpinButton = SpinHud.Buy
+local Folder = game.ReplicatedStorage.RngTools
+local TextoComOPecro=  SpinHud.TextLabel
+
+-- Codigo
+Button.MouseButton1Click:Connect(function()
+	MainFrame.Visible=  not MainFrame.Visible
+end)
+
+ItensButton.MouseButton1Click:Connect(function()
+	ItensHud.Visible = true
+	SpinHud.Visible = false
+end)
+ChangeMenuSpin.MouseButton1Click:Connect(function()
+	SpinHud.Visible = true
+	ItensHud.Visible = false
+end)
+
+-- Itens Script!
+for _, Tools in pairs(Folder:GetChildren()) do
+	if Tools:IsA('Tool') then
+		local image = ItensHud.ToolBase:Clone()
+		image.Image = Tools.TextureId
+		image.Parent = ItensHud
+		image.Visible = true
+	end
+end
+
+-- Buy Script
+local Preco = 5
+for num in string.gmatch(TextoComOPecro.Text, "%d+") do
+	Preco = tonumber(num)
+end
+
+SpinButton.MouseButton1Click:Connect(function()
+	if Currency.Value >= Preco then
+		Currency.Value -= Preco
+		local Tools = Folder:GetChildren()
+		if #Tools >0 then
+			local random = math.random(1,#Tools)
+			local Tool = Tools[random]:Clone()
+			Tool.Parent = plr.Backpack
+		end
+	end
+end)
